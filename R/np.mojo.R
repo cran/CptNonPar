@@ -2,8 +2,8 @@
 #' @description For a given lagged value of the time series, performs nonparametric change point detection of a possibly multivariate
 #' time series. If \code{lag} \eqn{\ell = 0}, then only marginal changes are detected.
 #' If \code{lag} \eqn{\ell \neq 0}, then changes in the pairwise distribution of \eqn{(X_t , X_{t+\ell})} are detected.
-#' @details The single-lag NP-MOJO algorithm for nonparametric change point detection is described in McGonigle, E. T. and Cho, H. (2023)
-#' Nonparametric data segmentation in multivariate time series via joint characteristic functions.  \emph{arXiv preprint arXiv:2305.07581}.
+#' @details The single-lag NP-MOJO algorithm for nonparametric change point detection is described in McGonigle, E. T. and Cho, H. (2025)
+#' Nonparametric data segmentation in multivariate time series via joint characteristic functions.  \emph{Biometrika} (to appear).
 #' @param x Input data (a \code{numeric} vector or an object of classes \code{ts} and \code{timeSeries},
 #' or a \code{numeric} matrix with rows representing observations and columns representing variables).
 #' @param G An integer value for the moving sum bandwidth;
@@ -12,11 +12,11 @@
 #' If \code{lag} \eqn{\ell \neq 0}, then changes in the pairwise distribution of \eqn{(X_t , X_{t+\ell})} are detected.
 #' @param kernel.f String indicating which kernel function to use when calculating the NP-MOJO detectors statistics; with \code{kern.par} \eqn{= a}, possible values are
 #'  \itemize{
-#'    \item \code{"quad.exp"}: kernel \eqn{h_2} in McGonigle and Cho (2023), kernel 5 in Fan et al. (2017):
+#'    \item \code{"quad.exp"}: kernel \eqn{h_2} in McGonigle and Cho (2025), kernel 5 in Fan et al. (2017):
 #'    \deqn{h (x,y) = \prod_{i=1}^{2p} \frac{ (2a - (x_i - y_i)^2) \exp (-\frac{1}{4a} (x_i - y_i)^2 )}{2a} .}
-#'    \item \code{"gauss"}: kernel \eqn{h_1} in McGonigle and Cho (2023), the standard Gaussian kernel:
+#'    \item \code{"gauss"}: kernel \eqn{h_1} in McGonigle and Cho (2025), the standard Gaussian kernel:
 #'    \deqn{h (x,y) = \exp ( - \frac{a^2}{2} \Vert x - y  \Vert^2) .}
-#'    \item \code{"euclidean"}: kernel \eqn{h_3} in McGonigle and Cho (2023), the Euclidean distance-based kernel:
+#'    \item \code{"euclidean"}: kernel \eqn{h_3} in McGonigle and Cho (2025), the Euclidean distance-based kernel:
 #'    \deqn{h (x, y ) = \Vert x - y \Vert^a  .}
 #'    \item \code{"laplace"}: kernel 2 in Fan et al. (2017), based on a Laplace weight function:
 #'      \deqn{h (x, y ) = \prod_{i=1}^{2p} \left( 1+ a^2 (x_i - y_i)^2  \right)^{-1}. }
@@ -36,7 +36,7 @@
 #'  if bootstrapping is performed.
 #' @param boot.method A string indicating the method for creating bootstrap replications. It is not recommended to change this. Possible choices are
 #' \itemize{
-#'    \item \code{"mean.subtract"}: the default choice, as described in McGonigle and Cho (2023).
+#'    \item \code{"mean.subtract"}: the default choice, as described in McGonigle and Cho (2025).
 #'    Empirical mean subtraction is performed to the bootstrapped replicates, improving power.
 #'        \item \code{"no.mean.subtract"}: empirical mean subtraction is not performed, improving size control.
 #' }
@@ -55,7 +55,7 @@
 #' changes, relative to bandwidth (if \code{criterion = "eta"} or \code{criterion = "eta.and.epsilon"}).
 #' @param epsilon a numeric value in (0,1] for the minimal size of exceeding
 #' environments, relative to moving sum bandwidth (if \code{criterion = "epsilon"} or \code{criterion = "eta.and.epsilon"}).
-#' @param use.mean \code{Logical variable}, only to be used if \code{data.drive.kern.par=TRUE}. If set to \code{TRUE}, the mean
+#' @param use.mean \code{Logical} variable, only to be used if \code{data.drive.kern.par=TRUE}. If set to \code{TRUE}, the mean
 #' of pairwise distances is used to set the kernel function tuning parameter, instead of the median. May be useful for binary data,
 #' not recommended to be used otherwise.
 #' @param threshold String indicating how the threshold is computed. Possible values are
@@ -78,8 +78,11 @@
 #'    \item{criterion, eta, epsilon}{Input parameters}
 #'    \item{test.stat}{A vector containing the NP-MOJO detector statistics computed from the input data}
 #'    \item{cpts}{A vector containing the estimated change point locations}
-#'    \item{p.vals}{The corresponding p values of the change points, if the bootstrap method was used}
-#' @references McGonigle, E.T., Cho, H. (2023). Nonparametric data segmentation in multivariate time series via joint characteristic functions. \emph{arXiv preprint arXiv:2305.07581}.
+#'    \item{scores}{The corresponding importance scores of the estimated change points.
+#'    The larger the score is, the more likely that there exists a change point close to the estimated location.
+#'    If the bootstrap method is used, this a value between 0 and 1 corresponding to the proportion of times the observed detector statistic was larger than the bootstrapped detector statistics.
+#'    Otherwise, the importance score is simply the value of the detector statistic at the estimated change point location (which is not necessarily less than 1).}
+#' @references McGonigle, E.T., Cho, H. (2025). Nonparametric data segmentation in multivariate time series via joint characteristic functions. \emph{Biometrika} (to appear).
 #' @references Fan, Y., de Micheaux, P.L., Penev, S. and Salopek, D. (2017). Multivariate nonparametric test of independence. \emph{Journal of Multivariate Analysis},
 #' 153, pp.189-210.
 #'
@@ -93,14 +96,14 @@
 #' x <- signal + noise
 #' x.c <- np.mojo(x, G = 83, lag = 0)
 #' x.c$cpts
-#' x.c$p.vals
+#' x.c$scores
 #' @importFrom Rcpp evalCpp
 #' @useDynLib CptNonPar, .registration = TRUE
 #' @importFrom foreach %dopar%
 #' @seealso \link{np.mojo.multilag}
 np.mojo <- function(x, G, lag = 0, kernel.f = c("quad.exp", "gauss", "euclidean", "laplace", "sine")[1],
                     kern.par = 1, data.driven.kern.par = TRUE, alpha = 0.1, threshold = c("bootstrap", "manual")[1],
-                    threshold.val = NULL, reps = 199, boot.dep = 1.5 * (nrow(as.matrix(x))^(1 / 3)), parallel = FALSE,
+                    threshold.val = NULL, reps = 200, boot.dep = 1.5 * (nrow(as.matrix(x))^(1 / 3)), parallel = FALSE,
                     boot.method = c("mean.subtract", "no.mean.subtract")[1],
                     criterion = c("eta", "epsilon", "eta.and.epsilon")[3], eta = 0.4, epsilon = 0.02, use.mean = FALSE) {
   mojo.error.checks(
@@ -194,7 +197,7 @@ np.mojo <- function(x, G, lag = 0, kernel.f = c("quad.exp", "gauss", "euclidean"
   }
 
   cpt.locs <- numeric(0)
-  p.vals <- numeric(0)
+  scores <- numeric(0)
 
   if (max(test.stat) > threshold.val) {
     exceedings <- (test.stat > threshold.val)
@@ -243,15 +246,15 @@ np.mojo <- function(x, G, lag = 0, kernel.f = c("quad.exp", "gauss", "euclidean"
     }
 
     if (threshold == "bootstrap") {
-      p.vals <- numeric(0)
+      scores <- numeric(0)
 
       for (i in seq_len(length(cpt.locs))) {
-        p.vals <- c(p.vals, sum(Tstar >= test.stat[cpt.locs[i]]) / (reps + 1))
+        scores <- c(scores, sum(test.stat[cpt.locs[i]] >= Tstar) / reps)
       }
     }
   } else {
     if (threshold == "bootstrap") {
-      p.vals <- sum(Tstar >= max(test.stat)) / (reps + 1)
+      scores <- sum(max(test.stat) >= Tstar) / reps
     }
   }
 
@@ -276,7 +279,7 @@ np.mojo <- function(x, G, lag = 0, kernel.f = c("quad.exp", "gauss", "euclidean"
     use.mean = use.mean,
     test.stat = test.stat,
     cpts = cpt.locs,
-    p.vals = p.vals
+    scores = scores
   )
 
   return(ret)

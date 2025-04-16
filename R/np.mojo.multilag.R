@@ -1,8 +1,8 @@
 #' @title Nonparametric Multiple Lag Change Point Detection
 #' @description For a given set of lagged values of the time series, performs nonparametric change point detection of a possibly multivariate
 #' time series.
-#' @details The multi-lag NP-MOJO algorithm for nonparametric change point detection is described in McGonigle, E. T. and Cho, H. (2023)
-#' Nonparametric data segmentation in multivariate time series via joint characteristic functions.  \emph{arXiv preprint arXiv:2305.07581}.
+#' @details The multi-lag NP-MOJO algorithm for nonparametric change point detection is described in McGonigle, E. T. and Cho, H. (2025)
+#' Nonparametric data segmentation in multivariate time series via joint characteristic functions.  \emph{Biometrika} (to appear).
 #' @param x Input data (a \code{numeric} vector or an object of classes \code{ts} and \code{timeSeries},
 #' or a \code{numeric} matrix with rows representing observations and columns representing variables).
 #' @param G An integer value for the moving sum bandwidth;
@@ -11,11 +11,11 @@
 #' \link{np.mojo} for further details.
 #' @param kernel.f String indicating which kernel function to use when calculating the NP-MOJO detector statistics; with \code{kern.par} \eqn{= a}, possible values are
 #'  \itemize{
-#'    \item \code{"quad.exp"}: kernel \eqn{h_2} in McGonigle and Cho (2023), kernel 5 in Fan et al. (2017):
+#'    \item \code{"quad.exp"}: kernel \eqn{h_2} in McGonigle and Cho (2025), kernel 5 in Fan et al. (2017):
 #'    \deqn{h (x,y) = \prod_{i=1}^{2p} \frac{ (2a - (x_i - y_i)^2) \exp (-\frac{1}{4a} (x_i - y_i)^2 )}{2a} .}
-#'    \item \code{"gauss"}: kernel \eqn{h_1} in McGonigle and Cho (2023), the standard Gaussian kernel:
+#'    \item \code{"gauss"}: kernel \eqn{h_1} in McGonigle and Cho (2025), the standard Gaussian kernel:
 #'    \deqn{h (x,y) = \exp ( - \frac{a^2}{2} \Vert x - y  \Vert^2) .}
-#'    \item \code{"euclidean"}: kernel \eqn{h_3} in McGonigle and Cho (2023), the Euclidean distance-based kernel:
+#'    \item \code{"euclidean"}: kernel \eqn{h_3} in McGonigle and Cho (2025), the Euclidean distance-based kernel:
 #'    \deqn{h (x, y ) = \Vert x - y \Vert^a  .}
 #'    \item \code{"laplace"}: kernel 2 in Fan et al. (2017), based on a Laplace weight function:
 #'      \deqn{h (x, y ) = \prod_{i=1}^{2p} \left( 1+ a^2 (x_i - y_i)^2  \right)^{-1}. }
@@ -33,7 +33,7 @@
 #'  if bootstrapping is performed.
 #' @param boot.method A string indicating the method for creating bootstrap replications. It is not recommended to change this. Possible choices are
 #'  \itemize{
-#'    \item \code{"mean.subtract"}: the default choice, as described in McGonigle and Cho (2023).
+#'    \item \code{"mean.subtract"}: the default choice, as described in McGonigle and Cho (2025).
 #'    Empirical mean subtraction is performed to the bootstrapped replicates, improving power.
 #'    \item \code{"no.mean.subtract"}: empirical mean subtraction is not performed, improving size control.
 #' }
@@ -60,9 +60,9 @@
 #' @param merge.type String indicating the method used to merge change point estimators from different lags. Possible choices are
 #'  \itemize{
 #'    \item \code{"sequential"}:  Starting from the left-most change point estimator and proceeding forward in time, estimators
-#'    are grouped into clusters based on mutual distance. The estimator yielding the smallest corresponding p-value is
-#'    chosen as the change point estimator for that cluster. See McGonigle and Cho (2023) for details.
-#'        \item \code{"bottom-up"}: starting with the smallest p-value, the change points are merged using bottom-up merging (Messer
+#'    are grouped into clusters based on mutual distance. The estimator yielding the largest corresponding importance score is
+#'    chosen as the change point estimator for that cluster. See McGonigle and Cho (2025) for details.
+#'        \item \code{"bottom-up"}: starting with the largest importance score, the change points are merged using bottom-up merging (Messer
 #'        et al. (2014)).
 #' }
 #' @param threshold String indicating how the threshold is computed. Possible values are
@@ -71,6 +71,8 @@
 #'        \item \code{"manual"}: the threshold is set by the user and must be specified using the \code{threshold.val} parameter.
 #' }
 #' @param threshold.val The value of the threshold used to declare change points, only to be used if \code{threshold = "manual"}.
+#' Can be either a single numeric value, in which case the same threshold is used for all lags, or a vector with length equal to the number of lags,
+#' where each elements in the vector gives the threshold value of the corresponding lag from the \code{lags} argument.
 #'
 #' @return A \code{list} object that contains the following fields:
 #'    \item{G}{Moving window bandwidth}
@@ -78,11 +80,11 @@
 #'    \item{kernel.f, data.driven.kern.par, use.mean}{Input parameters}
 #'    \item{threshold, alpha, reps, boot.dep, boot.method, parallel}{Input parameters}
 #'    \item{criterion, eta, epsilon}{Input parameters}
-#'    \item{cpts}{A matrix with rows corresponding to final change point estimators, with estimated change point location and associated lag and p-value given in columns.}
+#'    \item{cpts}{A matrix with rows corresponding to final change point estimators, with estimated change point location and associated lag and importance score given in columns.}
 #'    \item{cpt.clusters}{A \code{list} object of length given by the number of detected change points. Each field contains a matrix of all
 #'    change point estimators that are declared to be associated to the corresponding change point in the \code{cpts} field.}
-#' @references McGonigle, E.T., Cho, H. (2023). Nonparametric data segmentation in multivariate time series via joint characteristic functions.
-#' \emph{arXiv preprint arXiv:2305.07581}.
+#' @references McGonigle, E.T., Cho, H. (2025). Nonparametric data segmentation in multivariate time series via joint characteristic functions.
+#' \emph{Biometrika} (to appear).
 #' @references Fan, Y., de Micheaux, P.L., Penev, S. and Salopek, D. (2017). Multivariate nonparametric test of independence. \emph{Journal of Multivariate Analysis},
 #' 153, pp.189-210.
 #' @references Messer M., Kirchner M., Schiemann J., Roeper J., Neininger R., Schneider G. (2014). A Multiple Filter Test for
@@ -101,7 +103,7 @@
 #' @seealso \link{np.mojo}, \link{multilag.cpts.merge}
 np.mojo.multilag <- function(x, G, lags = c(0, 1), kernel.f = c("quad.exp", "gauss", "euclidean", "laplace", "sine")[1],
                              kern.par = 1, data.driven.kern.par = TRUE, threshold = c("bootstrap", "manual")[1], threshold.val = NULL,
-                             alpha = 0.1, reps = 199, boot.dep = 1.5 * (nrow(as.matrix(x))^(1 / 3)), parallel = FALSE,
+                             alpha = 0.1, reps = 200, boot.dep = 1.5 * (nrow(as.matrix(x))^(1 / 3)), parallel = FALSE,
                              boot.method = c("mean.subtract", "no.mean.subtract")[1], criterion = c("eta", "epsilon", "eta.and.epsilon")[3],
                              eta = 0.4, epsilon = 0.02, use.mean = FALSE, eta.merge = 1, merge.type = c("sequential", "bottom-up")[1]) {
   stopifnot(
@@ -118,22 +120,18 @@ np.mojo.multilag <- function(x, G, lags = c(0, 1), kernel.f = c("quad.exp", "gau
 
   lag.cpts <- vector(mode = "list", length = length(lags))
 
-  cpts <- init.cpts <- matrix(NA, nrow = 0, ncol = 3)
-  dimnames(init.cpts)[[2]] <- c("cp", "lag", "p.val")
-  dimnames(cpts)[[2]] <- c("cp", "lag", "p.val")
+  if(length(threshold.val) == 1){
+    threshold.val <- rep(threshold.val, length(lags))
+  }
 
   for (l in seq_len(length(lag.cpts))) {
     lag.cpts[[l]] <- np.mojo(
       x = x, G = G, lag = lags[l], kernel.f = kernel.f, data.driven.kern.par = data.driven.kern.par,
       alpha = alpha, kern.par = kern.par, reps = reps, boot.dep = boot.dep, parallel = parallel,
       boot.method = boot.method, criterion = criterion, eta = eta, epsilon = epsilon, use.mean = use.mean, threshold = threshold,
-      threshold.val = threshold.val
+      threshold.val = threshold.val[l]
     )
 
-    if (length(lag.cpts[[l]]$cpts) > 0) {
-      new.cpts <- cbind(lag.cpts[[l]]$cpts, rep(lags[l], length(lag.cpts[[l]]$cpts)), lag.cpts[[l]]$p.vals)
-      init.cpts <- rbind(init.cpts, new.cpts)
-    }
   }
 
   merged.cpts <- multilag.cpts.merge(lag.cpts, eta.merge = eta.merge, merge.type = merge.type)
@@ -144,6 +142,7 @@ np.mojo.multilag <- function(x, G, lags = c(0, 1), kernel.f = c("quad.exp", "gau
     kernel.f = kernel.f,
     data.driven.kern.par = data.driven.kern.par,
     threshold = threshold,
+    threshold.val = threshold.val,
     boot.dep = boot.dep,
     boot.method = boot.method,
     reps = reps,
