@@ -2,7 +2,7 @@ Package: CptNonPar
 Type: Package
 Title: Nonparametric Change Point Detection for Multivariate Time
         Series
-Version: 0.3.0
+Version: 0.3.1
 Depends: R (>= 4.1.0)
 Authors@R: c(person("Euan T.", "McGonigle", email="e.t.mcgonigle@soton.ac.uk", role=c("aut", "cre")),
     person("Haeran", "Cho", email = "haeran.cho@bristol.ac.uk", role="aut"))
@@ -22,8 +22,8 @@ RoxygenNote: 7.3.2
 Suggests: covr, testthat (>= 3.0.0)
 Config/testthat/edition: 3
 NeedsCompilation: yes
-Packaged: 2025-04-16 14:05:12 UTC; euanmcgonigle
+Packaged: 2025-11-25 12:25:01 UTC; euanmcgonigle
 Author: Euan T. McGonigle [aut, cre],
   Haeran Cho [aut]
 Repository: CRAN
-Date/Publication: 2025-04-16 14:30:21 UTC
+Date/Publication: 2025-11-25 12:42:10 UTC
